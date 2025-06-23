@@ -95,9 +95,13 @@ def rag_chain_manual(question):
         return f"Terjadi kesalahan: {str(e)}"
 
 # --- Routes ---
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/chatbot")
+def chatbot():
+    return render_template("chatbot.html")
 
 @app.route("/get", methods=["POST"])
 def get_bot_response():
