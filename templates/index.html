@@ -7,7 +7,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Open Sans', sans-serif; line-height: 1.6; background: #f9f9f9; }
+    html, body {
+      font-family: 'Open Sans', sans-serif;
+      line-height: 1.6;
+      background: #f9f9f9;
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      height: 100%;
+      max-width: 100vw;
+    }
 
     header {
       background: #004aad;
@@ -20,14 +30,90 @@
       transition: all 0.3s ease;
     }
     header.scrolled { box-shadow: 0 2px 5px rgba(0,0,0,0.2); background: #003080; }
-    .container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto; }
-    nav.nav-menu { display: flex; gap: 15px; }
-    nav.nav-menu a { color: white; text-decoration: none; font-weight: bold; }
 
-    .menu-toggle { display: none; cursor: pointer; font-size: 24px; }
-    .nav-menu.active { display: block; position: absolute; top: 60px; background: #004aad; width: 100%; left: 0; flex-direction: column; padding: 10px; }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 0 10px;
+    }
 
-    section { padding: 100px 20px 40px; max-width: 1000px; margin: auto; }
+    .container .brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+    }
+
+    .container .brand img {
+      height: 50px;
+      width: auto;
+    }
+
+    .container .brand .brand-text {
+      line-height: 1.2;
+      font-size: 16px;
+    }
+
+    .container .brand .brand-text div {
+      font-weight: bold;
+    }
+
+    nav.nav-menu {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      flex: 1 1 auto;
+    }
+
+    nav.nav-menu a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .menu-toggle {
+      display: none;
+      cursor: pointer;
+      font-size: 24px;
+    }
+
+    .nav-menu.active {
+      display: block;
+      position: absolute;
+      top: 60px;
+      background: #004aad;
+      width: 100%;
+      left: 0;
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    section {
+      width: 100vw;
+      max-width: 100vw;
+      overflow-x: hidden;
+      min-height: 100vh;
+      padding: 120px 20px 40px;
+      box-sizing: border-box;
+      scroll-snap-align: start;
+      border-bottom: 2px solid #ddd;
+      display: flex;
+      justify-content: center;
+    }
+
+    section > .content {
+      width: 100%;
+      max-width: 1200px;
+    }
+
     h2 { color: #004aad; margin-bottom: 20px; }
 
     .chat-toggle-btn {
@@ -42,6 +128,7 @@
       cursor: pointer;
       z-index: 1000;
     }
+
     .chat-box {
       display: none;
       position: fixed;
@@ -54,6 +141,7 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       z-index: 1000;
     }
+
     .chat-box.active { display: block; }
     .chat-header { background: #004aad; color: white; padding: 10px; display: flex; justify-content: space-between; }
     .chat-messages { max-height: 200px; overflow-y: auto; padding: 10px; }
@@ -64,50 +152,59 @@
     @media (max-width: 768px) {
       .menu-toggle { display: block; }
       nav.nav-menu { display: none; flex-direction: column; }
-
+      .container { flex-direction: column; align-items: flex-start; }
+      .container .brand {
+        justify-content: center;
+        width: 100%;
+      }
+      nav.nav-menu {
+        width: 100%;
+        justify-content: center;
+      }
     }
+
     .berita-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
 
-.berita-item {
-  display: flex;
-  flex-direction: row;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
+    .berita-item {
+      display: flex;
+      flex-direction: row;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
 
-.berita-item img {
-  width: 200px;
-  height: auto;
-  object-fit: cover;
-}
+    .berita-item img {
+      width: 200px;
+      height: auto;
+      object-fit: cover;
+    }
 
-.berita-text {
-  padding: 15px 20px;
-  flex: 1;
-}
+    .berita-text {
+      padding: 15px 20px;
+      flex: 1;
+    }
 
-.berita-text h3 {
-  margin-top: 0;
-  color: #004aad;
-}
+    .berita-text h3 {
+      margin-top: 0;
+      color: #004aad;
+    }
 
-@media (max-width: 768px) {
-  .berita-item {
-    flex-direction: column;
-  }
+    @media (max-width: 768px) {
+      .berita-item {
+        flex-direction: column;
+      }
 
-  .berita-item img {
-    width: 100%;
-    height: auto;
-  }
-}
+      .berita-item img {
+        width: 100%;
+        height: auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -136,6 +233,7 @@
 
 
   <section id="profil">
+  <div class="content">
   <h2>Profil Disdukcapil Kabupaten Batang</h2>
   <div style="display: flex; flex-wrap: wrap; gap: 20px;">
     <!-- Bagian Teks -->
@@ -154,15 +252,18 @@
         <li><strong>Email:</strong> disdukcapil@batangkab.go.id</li>
       </ul>
     </div>
+    
 
     <!-- Bagian Gambar -->
     <div style="flex: 1 1 300px;">
       <img src="static/img/dukcapilkantor.jpeg" alt="Disdukcapil Kabupaten Batang" style="width: 100%; border-radius: 10px;" />
     </div>
   </div>
+  </div>
 </section>
 
   <section id="program">
+  <div class="content">
   <h2>Program Layanan Disdukcapil</h2>
   <div class="row" style="display: flex; flex-wrap: wrap; gap: 20px;">
     <!-- Program 1 -->
@@ -195,9 +296,11 @@
       </div>
     </div>
   </div>
+</div>
 </section>
 
   <section id="ppid">
+  <div class="content">
   <h2>PPID Disdukcapil Kabupaten Batang</h2>
   <div style="max-width: 900px; margin: auto; text-align: justify;">
     <p>
@@ -228,9 +331,11 @@
       <p style="font-size: 0.9em; color: #555;">Gambar: Struktur Organisasi PPID Disdukcapil Kabupaten Batang</p>
     </div>
   </div>
+</div>
 </section>
 
   <section id="berita">
+  <div class="content">
   <h2>Berita</h2>
   <div class="berita-container">
     <!-- Berita 1 -->
@@ -265,11 +370,12 @@
       <img src="/static/img/infografis_jenis_pelayanan.jpeg" alt="Jenis Pelayanan" style="width: 100%; border-radius: 8px;">
       <p style="margin-top: 10px;">Jenis-Jenis Pelayanan Dukcapil</p>
     </div>
-
+  </div>
   </div>
 </section>
 
  <section id="info-penting">
+  <div class="content">
   <h2>Info Penting</h2>
   <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 20px;">
     
@@ -288,11 +394,12 @@
         Mohon maklum dan terima kasih atas perhatian Anda.
       </p>
     </div>
-
+  </div>
   </div>
 </section>
 
   <section id="galeri">
+  <div class="content">
   <h2>Galeri Kegiatan</h2>
   <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px;">
     
@@ -310,13 +417,13 @@
       <img src="/static/img/galeri3.jpeg" alt="Kegiatan 3" style="width: 100%; border-radius: 10px;">
       <p style="text-align: center; margin-top: 10px;">Jemut Bola Rekam KTP el ODGJ dan Disabilitas</p>
     </div>
-
+  </div>
   </div>
 </section>
 
-  <section id="download" style="padding: 100px 20px 40px; max-width: 1000px; margin: auto;">
-  <h2 style="color: #004aad; margin-bottom: 20px;">Download Formulir</h2>
-
+  <section id="download">
+  <div class="content">
+  <h2>Download Formulir</h2>
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
     <!-- Item 1 -->
     <div style="flex: 1 1 300px; max-width: 32%; background: #fff; border: 1px solid #ccc; border-radius: 10px; padding: 15px;">
@@ -345,6 +452,7 @@
       </div>
     </div>
   </div>
+</div>
 </section>
 
   <div class="chat-icon" onclick="toggleChat()">
