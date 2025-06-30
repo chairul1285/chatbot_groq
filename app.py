@@ -1,47 +1,20 @@
 from flask import Flask, request, render_template
-import pickle, os, requests
+import pickle, os
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-app = Flask(__name__)
+app = Flask(_name_)
 
-# --- Fungsi Download dari Google Drive ---
-def download_file_from_google_drive(file_id, destination):
-    URL = "https://docs.google.com/uc?export=download"
-    session = requests.Session()
+# === Lokasi Vectorstore ===
+VECTORSTORE_PATH = "chatbot/vectorstore.pkl"
 
-    response = session.get(URL, params={'id': file_id}, stream=True)
-
-    def get_confirm_token(response):
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                return value
-        return None
-
-    token = get_confirm_token(response)
-    if token:
-        response = session.get(URL, params={'id': file_id, 'confirm': token}, stream=True)
-
-    os.makedirs(os.path.dirname(destination), exist_ok=True)
-
-    with open(destination, 'wb') as f:
-        for chunk in response.iter_content(32768):
-            if chunk:
-                f.write(chunk)
-
-# Unduh vectorstore jika belum ada
-if not os.path.exists(VECTORSTORE_PATH):
-    print("Mengunduh vectorstore.pkl dari Google Drive...")
-    download_file_from_google_drive(VECTORSTORE_ID, VECTORSTORE_PATH)
-    print("Unduhan selesai.")
-
-# Load vectorstore
+# === Load vectorstore dari lokal ===
 try:
     with open(VECTORSTORE_PATH, "rb") as f:
         vectorstore = pickle.load(f)
 
-    # Optional: patch jika atribut hilang
+    # Patch jika atribut show_progress hilang
     if hasattr(vectorstore, "embedding"):
         embedding_obj = vectorstore.embedding
         if not hasattr(embedding_obj, "show_progress"):
@@ -58,7 +31,7 @@ llm = ChatGroq(
     groq_api_key="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"
 )
 
-# === Prompt LangChain ===
+# === Prompt Template ===
 system_prompt = (
     "Anda adalah asisten untuk menjawab pertanyaan tentang administrasi kependudukan. "
     "Gunakan informasi dari konteks untuk menjawab dengan jelas, ringkas, dan dalam bahasa Indonesia. "
@@ -71,10 +44,39 @@ chat_prompt = ChatPromptTemplate.from_messages([
     ("system", system_prompt),
     ("human", "{question}")
 ])
-
 output_parser = StrOutputParser()
 
-# --- RAG Function ---
+# === Validasi Pertanyaan ===
+def is_valid_question(question):
+    question = question.strip().lower()
+    greetings = {
+        'hai', 'halo', 'hi', 'hello',
+        'assalamualaikum', 'selamat pagi', 'selamat siang', 'selamat malam',
+        'terima kasih', 'makasih', 'thanks', 'thank you',
+        'ok', 'oke', 'baik', 'sip'
+    }
+
+    if question in greetings:
+        return True
+
+    if len(question) < 4:
+        return False
+    if len(question.split()) == 1:
+        meaningless = {'ya', 'tidak', 'enggak', 'loh', 'lah', 'hmm', 'eh'}
+        if question in meaningless or len(question) <= 3:
+            return False
+
+    keywords = [
+        'ktp', 'akta', 'kelahiran', 'kematian', 'kartu keluarga', 'kk', 'nik',
+        'dukcapil', 'pelayanan', 'dokumen', 'perekaman', 'pengurusan',
+        'formulir', 'online', 'alamat', 'jam buka', 'syarat'
+    ]
+    if not any(word in question for word in keywords):
+        return False
+
+    return True
+
+# === Proses Chat ===
 def rag_chain_manual(question):
     try:
         if vectorstore is None:
@@ -86,24 +88,24 @@ def rag_chain_manual(question):
         response = llm.invoke(prompt)
         final_answer = output_parser.invoke(response)
 
-        # Tambahkan link hanya jika konteksnya relevan DAN belum ditambahkan
+        # Tambahkan link jika relevan
         if "formulir" in final_answer.lower():
             final_answer += (
-            '<br><br>📄 Silakan unduh formulir di sini: '
-            '<a href="http://203.194.112.181:5000/#download" target="_blank">disdukcapil.batangkab.go.id</a>'
+                '<br><br>📄 Silakan unduh formulir di sini: '
+                '<a href="http://localhost:5000/#download" target="_blank">disdukcapil.batangkab.go.id</a>'
             )
-
         if "alamat" in final_answer.lower():
             final_answer += (
-            '<br><br>📍 Alamat Disdukcapil Batang bisa dilihat di Google Maps: '
-            '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7216395" target="_blank">Lihat di Google Maps</a>'
+                '<br><br>📍 Lihat lokasi di Google Maps: '
+                '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7216395" target="_blank">Google Maps</a>'
             )
-        return final_answer    
+
+        return final_answer
 
     except Exception as e:
-        return f"Terjadi kesalahan: {str(e)}"
+        return f"❌ Terjadi kesalahan saat memproses: {str(e)}"
 
-# --- Routes ---
+# === Routes ===
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -113,7 +115,7 @@ def chatbot():
     return render_template("chatbot.html")
 
 @app.route("/get", methods=["POST"])
-def get_bot_response():
+def get_response():
     user_input = request.form.get("msg")
     if not user_input:
         return "Pertanyaan kosong."
@@ -124,6 +126,7 @@ def get_bot_response():
         'terima kasih', 'makasih', 'thanks', 'thank you',
         'ok', 'oke', 'baik', 'sip'
     }
+
     if user_input.strip().lower() in greetings:
         return "Terima kasih, ada yang bisa kami bantu?"
 
@@ -132,7 +135,7 @@ def get_bot_response():
 
     return rag_chain_manual(user_input)
 
-# --- Run Server ---
-if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))  # default ke 5000 jika PORT tidak disetel
-    app.run(host='0.0.0.0', port=port)
+# === Jalankan Aplikasi ===
+if _name_ == "_main_":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
