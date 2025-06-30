@@ -10,6 +10,7 @@ app = Flask(__name__)
 def download_file_from_google_drive(file_id, destination):
     URL = "https://docs.google.com/uc?export=download"
     session = requests.Session()
+
     response = session.get(URL, params={'id': file_id}, stream=True)
 
     def get_confirm_token(response):
@@ -22,37 +23,42 @@ def download_file_from_google_drive(file_id, destination):
     if token:
         response = session.get(URL, params={'id': file_id, 'confirm': token}, stream=True)
 
+    os.makedirs(os.path.dirname(destination), exist_ok=True)
+
     with open(destination, 'wb') as f:
         for chunk in response.iter_content(32768):
             if chunk:
                 f.write(chunk)
 
-# --- Cek dan Unduh .pkl jika Belum Ada ---
-VECTORSTORE_PATH = "chatbot/vectorstore.pkl"
-VECTORSTORE_ID = "1bX3Moq7-rZg4IDFrSXvEsgtUU2FiA7Fy"  # Ganti dengan ID asli
-
+# Unduh vectorstore jika belum ada
 if not os.path.exists(VECTORSTORE_PATH):
-    print("Mengunduh vectorstore dari Google Drive...")
+    print("Mengunduh vectorstore.pkl dari Google Drive...")
     download_file_from_google_drive(VECTORSTORE_ID, VECTORSTORE_PATH)
+    print("Unduhan selesai.")
 
-# --- Load Vectorstore ---
-with open(VECTORSTORE_PATH, "rb") as f:
-    vectorstore = pickle.load(f)
+# Load vectorstore
+try:
+    with open(VECTORSTORE_PATH, "rb") as f:
+        vectorstore = pickle.load(f)
 
-# --- Patch jika atribut show_progress hilang ---
-if hasattr(vectorstore, "embedding"):
-    embedding_obj = vectorstore.embedding
-    if not hasattr(embedding_obj, "show_progress"):
-        setattr(embedding_obj, "show_progress", False)
+    # Optional: patch jika atribut hilang
+    if hasattr(vectorstore, "embedding"):
+        embedding_obj = vectorstore.embedding
+        if not hasattr(embedding_obj, "show_progress"):
+            setattr(embedding_obj, "show_progress", False)
 
-# --- Inisialisasi Groq LLM ---
+except Exception as e:
+    print("❌ Gagal membuka vectorstore.pkl:", e)
+    vectorstore = None
+
+# === Konfigurasi Groq LLM ===
 llm = ChatGroq(
     temperature=0,
     model_name="llama3-8b-8192",
     groq_api_key="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"
 )
 
-# --- Prompt Sistem ---
+# === Prompt LangChain ===
 system_prompt = (
     "Anda adalah asisten untuk menjawab pertanyaan tentang administrasi kependudukan. "
     "Gunakan informasi dari konteks untuk menjawab dengan jelas, ringkas, dan dalam bahasa Indonesia. "
@@ -71,6 +77,9 @@ output_parser = StrOutputParser()
 # --- RAG Function ---
 def rag_chain_manual(question):
     try:
+        if vectorstore is None:
+            return "Data chatbot belum tersedia. Silakan coba lagi nanti."
+
         docs = vectorstore.similarity_search(question, k=4)
         context = "\n\n".join([doc.page_content for doc in docs])
         prompt = chat_prompt.format(context=context, question=question)
@@ -108,6 +117,19 @@ def get_bot_response():
     user_input = request.form.get("msg")
     if not user_input:
         return "Pertanyaan kosong."
+
+    greetings = {
+        'hai', 'halo', 'hi', 'hello',
+        'assalamualaikum', 'selamat pagi', 'selamat siang', 'selamat malam',
+        'terima kasih', 'makasih', 'thanks', 'thank you',
+        'ok', 'oke', 'baik', 'sip'
+    }
+    if user_input.strip().lower() in greetings:
+        return "Terima kasih, ada yang bisa kami bantu?"
+
+    if not is_valid_question(user_input):
+        return "Mohon maaf, saya hanya bisa menjawab pertanyaan terkait administrasi kependudukan."
+
     return rag_chain_manual(user_input)
 
 # --- Run Server ---
