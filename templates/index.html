@@ -19,12 +19,18 @@ html, body {
   line-height: 1.6;
   background: #f9f9f9;
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
   overflow-x: hidden;
   max-width: 100vw;
+  padding-top: 100px; /* ruang untuk header tetap */
 }
 
-/* === HEADER === */
+@media (max-width: 768px) {
+  body {
+    padding-top: 120px; /* untuk header yang lebih tinggi di HP */
+  }
+}
+
+/* === Header === */
 header {
   background: #004aad;
   color: white;
@@ -35,12 +41,12 @@ header {
   z-index: 1000;
   transition: all 0.3s ease;
 }
+
 header.scrolled {
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   background: #003080;
 }
 
-/* === CONTAINER === */
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -51,33 +57,35 @@ header.scrolled {
   padding: 0 15px;
 }
 
-/* === LOGO & BRAND === */
 .brand {
   display: flex;
   align-items: center;
   gap: 15px;
   flex-wrap: wrap;
 }
+
 .brand img {
   height: 50px;
   width: auto;
 }
+
 .brand-text {
   line-height: 1.2;
   font-size: 16px;
 }
+
 .brand-text div {
   font-weight: bold;
   font-size: 14px;
 }
 
-/* === NAVIGASI MENU === */
 nav.nav-menu {
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+
 nav.nav-menu a {
   color: white;
   text-decoration: none;
@@ -91,6 +99,7 @@ nav.nav-menu a {
   font-size: 24px;
   color: white;
 }
+
 .nav-menu.active {
   display: flex;
   flex-direction: column;
@@ -103,7 +112,7 @@ nav.nav-menu a {
   z-index: 999;
 }
 
-/* === SECTION === */
+/* === Section === */
 section {
   height: 100vh;
   overflow: hidden;
@@ -114,7 +123,13 @@ section {
   justify-content: center;
   align-items: flex-start;
   box-sizing: border-box;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 100px; /* untuk offset scroll */
+}
+
+@media (max-width: 768px) {
+  section {
+    scroll-margin-top: 120px; /* offset lebih tinggi di HP */
+  }
 }
 
 section > .content {
@@ -125,7 +140,7 @@ section > .content {
   padding-right: 10px;
 }
 
-/* Scrollbar Style */
+/* Scrollbar */
 section > .content::-webkit-scrollbar {
   width: 6px;
 }
@@ -137,7 +152,7 @@ section > .content::-webkit-scrollbar-thumb:hover {
   background: #666;
 }
 
-/* === JUDUL SECTION === */
+/* === Judul Section === */
 h2 {
   color: #004aad;
   margin-bottom: 20px;
@@ -145,7 +160,7 @@ h2 {
   text-align: center;
 }
 
-/* === INFOGRAFIS === */
+/* === Infografis === */
 .infografis-grid {
   display: flex;
   flex-wrap: wrap;
@@ -153,11 +168,13 @@ h2 {
   gap: 24px;
   margin-top: 30px;
 }
+
 .infografis-item {
   flex: 1 1 calc(33.333% - 24px);
   max-width: 300px;
   text-align: center;
 }
+
 .infografis-item img {
   width: 100%;
   height: 180px;
@@ -165,13 +182,14 @@ h2 {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
 .infografis-item p {
   margin-top: 8px;
   font-size: 14px;
   color: #333;
 }
 
-/* === INFO PENTING === */
+/* === Info Penting === */
 .info-penting-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -179,10 +197,12 @@ h2 {
   gap: 20px;
   margin-top: 20px;
 }
+
 .info-penting-image {
   flex: 1 1 300px;
   max-width: 350px;
 }
+
 .info-penting-image img {
   width: 100%;
   max-height: 220px;
@@ -190,6 +210,7 @@ h2 {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
 .info-penting-text {
   flex: 2 1 400px;
   font-size: 16px;
@@ -198,13 +219,14 @@ h2 {
   text-align: justify;
 }
 
-/* === BERITA === */
+/* === Berita === */
 .berita-container {
   display: flex;
   flex-direction: column;
   gap: 30px;
   margin-top: 30px;
 }
+
 .berita-item {
   display: flex;
   flex-wrap: wrap;
@@ -213,6 +235,7 @@ h2 {
   border-bottom: 1px solid #ddd;
   padding-bottom: 20px;
 }
+
 .berita-item img {
   width: 300px;
   height: 180px;
@@ -221,33 +244,36 @@ h2 {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   flex-shrink: 0;
 }
+
 .berita-text {
   flex: 1;
   min-width: 200px;
 }
+
 .berita-text h3 {
   font-size: 18px;
   color: #004aad;
   margin-bottom: 10px;
 }
+
 .berita-text p {
   font-size: 14px;
   color: #333;
   line-height: 1.6;
 }
 
-/* === ZOOM HOVER EFFECT === */
+/* === Efek Zoom Gambar === */
 .zoom-hover {
   transition: transform 0.3s ease-in-out;
   cursor: zoom-in;
 }
+
 .zoom-hover:hover {
   transform: scale(1.5);
   z-index: 10;
   position: relative;
 }
 
-/* Pastikan gambar tetap dalam batas zoom */
 .infografis-item,
 .berita-item img,
 .info-penting-image,
@@ -257,7 +283,7 @@ h2 {
   position: relative;
 }
 
-/* === RESPONSIVE === */
+/* === Responsive === */
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
