@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <link rel="icon" href="{{ url_for('static', filename='favicon/logo-batang.ico') }}" type="image/x-icon">
   <style>
-    /* === Reset & Umum === */
+/* === RESET & DASAR === */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -24,7 +24,7 @@ html, body {
   max-width: 100vw;
 }
 
-/* === Header === */
+/* === HEADER === */
 header {
   background: #004aad;
   color: white;
@@ -40,6 +40,7 @@ header.scrolled {
   background: #003080;
 }
 
+/* === CONTAINER === */
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -50,6 +51,7 @@ header.scrolled {
   padding: 0 15px;
 }
 
+/* === LOGO & BRAND === */
 .brand {
   display: flex;
   align-items: center;
@@ -69,6 +71,7 @@ header.scrolled {
   font-size: 14px;
 }
 
+/* === NAVIGASI MENU === */
 nav.nav-menu {
   display: flex;
   gap: 15px;
@@ -100,7 +103,7 @@ nav.nav-menu a {
   z-index: 999;
 }
 
-/* === Section === */
+/* === SECTION === */
 section {
   height: 100vh;
   overflow: hidden;
@@ -111,7 +114,7 @@ section {
   justify-content: center;
   align-items: flex-start;
   box-sizing: border-box;
-  scroll-margin-top: 100px; /* offset agar tidak tertutup header */
+  scroll-margin-top: 100px;
 }
 
 section > .content {
@@ -122,7 +125,7 @@ section > .content {
   padding-right: 10px;
 }
 
-/* Scrollbar di dalam section */
+/* Scrollbar Style */
 section > .content::-webkit-scrollbar {
   width: 6px;
 }
@@ -134,7 +137,7 @@ section > .content::-webkit-scrollbar-thumb:hover {
   background: #666;
 }
 
-/* === Judul Section === */
+/* === JUDUL SECTION === */
 h2 {
   color: #004aad;
   margin-bottom: 20px;
@@ -142,7 +145,7 @@ h2 {
   text-align: center;
 }
 
-/* === Infografis & Info Penting === */
+/* === INFOGRAFIS === */
 .infografis-grid {
   display: flex;
   flex-wrap: wrap;
@@ -168,7 +171,7 @@ h2 {
   color: #333;
 }
 
-/* === Info Penting Alternatif Layout (Gambar Kiri, Teks Kanan) === */
+/* === INFO PENTING === */
 .info-penting-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -195,13 +198,14 @@ h2 {
   text-align: justify;
 }
 
-/* === Berita === */
+/* === BERITA === */
 .berita-container {
   display: flex;
   flex-direction: column;
   gap: 30px;
   margin-top: 30px;
-}.berita-item {
+}
+.berita-item {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -216,10 +220,12 @@ h2 {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   flex-shrink: 0;
-}.berita-text {
+}
+.berita-text {
   flex: 1;
   min-width: 200px;
-}.berita-text h3 {
+}
+.berita-text h3 {
   font-size: 18px;
   color: #004aad;
   margin-bottom: 10px;
@@ -230,7 +236,28 @@ h2 {
   line-height: 1.6;
 }
 
-/* === Responsive === */
+/* === ZOOM HOVER EFFECT === */
+.zoom-hover {
+  transition: transform 0.3s ease-in-out;
+  cursor: zoom-in;
+}
+.zoom-hover:hover {
+  transform: scale(1.5);
+  z-index: 10;
+  position: relative;
+}
+
+/* Pastikan gambar tetap dalam batas zoom */
+.infografis-item,
+.berita-item img,
+.info-penting-image,
+.galeri-item,
+.card img {
+  overflow: hidden;
+  position: relative;
+}
+
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -304,25 +331,6 @@ h2 {
   section > .content {
     max-height: none;
   }
-  .zoom-hover {
-  transition: transform 0.3s ease-in-out;
-  cursor: zoom-in;
-}
-.zoom-hover:hover {
-  transform: scale(1.5);
-  z-index: 10;
-  position: relative;
-}
-
-/* Pastikan gambar tetap berada di dalam pembungkus saat zoom */
-.infografis-item,
-.berita-item img,
-.info-penting-image,
-.galeri-item,
-.card img {
-  overflow: hidden;
-  position: relative;
-}
 }
 </style>
 </head>
