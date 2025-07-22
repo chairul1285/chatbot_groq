@@ -92,7 +92,7 @@ def rag_chain_manual(question):
         if "formulir" in final_answer.lower():
             final_answer += (
                 '<br><br>📄 Silakan unduh formulir di sini: '
-                '<a href="http://localhost:5000/#download" target="_blank">disdukcapil.batangkab.go.id</a>'
+                '<a href="http://203.194.112.181:5000/#download" target="_blank">disdukcapil.batangkab.go.id</a>'
             )
         if "alamat" in final_answer.lower():
             final_answer += (
