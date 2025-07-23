@@ -97,7 +97,7 @@ def rag_chain_manual(question):
         if "alamat" in final_answer.lower():
             final_answer += (
                 '<br><br>📍 Lihat lokasi di Google Maps: '
-                '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7216395" target="_blank">Google Maps</a>'
+                '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7190646,1130m/data=!3m2!1e3!4b1!4m6!3m5!1s0x2e7025ee93ed0c6f:0x79cdf4bdd97b28c6!8m2!3d-6.9158304!4d109.7216395!16s%2Fg%2F11fjx9_wkr?entry=ttu&g_ep=EgoyMDI1MDcyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank">Google Maps</a>'
             )
 
         return final_answer
