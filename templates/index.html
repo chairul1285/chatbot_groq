@@ -2,272 +2,761 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-  <title>Chatbot Dukcapil</title>
-
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disdukcapil Kabupaten Batang</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
-
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="/static/css/stylecb.css"/>
-  <link rel="stylesheet" href="/static/css/stylelanding.css"/>
-  <link rel="stylesheet" href="/static/css/responsive.css"/>
-
-  <!-- jQuery -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-  <!-- Font Awesome -->
-  <script src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"></script>
-
+  <link rel="icon" href="{{ url_for('static', filename='favicon/logo-batang.ico') }}" type="image/x-icon">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+/* === RESET & DASAR === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    body {
-      font-family: 'Open Sans', sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
-    }
+html, body {
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.6;
+  background: #f9f9f9;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
+  padding-top: 100px; /* ruang untuk header tetap */
+}
 
-    .msger {
-      width: 100%;
-      max-width: 600px;
-      height: 100vh;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
+@media (max-width: 768px) {
+  body {
+    padding-top: 120px; /* untuk header yang lebih tinggi di HP */
+  }
+}
 
-    .centered-header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: rgb(20, 3, 252);
-      padding: 15px;
-      flex-direction: column;
-    }
+/* === Header === */
+header {
+  background: #004aad;
+  color: white;
+  padding: 20px 10px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
 
-    .logo-circle {
-      background-color: white;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 60px;
-      height: 60px;
-      overflow: hidden;
-    }
+header.scrolled {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  background: #003080;
+}
 
-    .logo-circle img {
-      width: 60px;
-      height: auto;
-    }
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 15px;
+}
 
-    .msger-controls {
-      padding: 5px 10px;
-      background: #f0f0f0;
-      border-bottom: 1px solid #ddd;
-    }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
 
-    .msger-controls label {
-      font-size: 0.8em;
-      margin-right: 5px;
-    }
+.brand img {
+  height: 50px;
+  width: auto;
+}
 
-    .msger-controls select {
-      font-size: 0.8em;
-      padding: 3px;
-    }
+.brand-text {
+  line-height: 1.2;
+  font-size: 16px;
+}
 
-    .msger-chat {
-      flex-grow: 1;
-      padding: 10px;
-      overflow-y: auto;
-      background: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-    }
+.brand-text div {
+  font-weight: bold;
+  font-size: 14px;
+}
 
-    .msg {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: flex-start;
-    }
+nav.nav-menu {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 
-    .msg.right-msg {
-      flex-direction: row-reverse;
-    }
+nav.nav-menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+}
 
-    .msg .msg-img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin: 0 10px;
-      flex-shrink: 0;
-    }
+.menu-toggle {
+  display: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: white;
+}
 
-    .msg .msg-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+.nav-menu.active {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  background-color: #004aad;
+  padding: 10px 0;
+  z-index: 999;
+}
 
-    .msg-bubble {
-      max-width: 80%;
-      padding: 10px 15px;
-      border-radius: 10px;
-      background-color: #e6f4ea;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      overflow-wrap: break-word;
-      word-break: break-word;
-    }
+/* === Section === */
+section {
+  height: 100vh;
+  overflow: hidden;
+  padding: 120px 20px 40px;
+  scroll-snap-align: start;
+  border-bottom: 2px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+  scroll-margin-top: 100px; /* untuk offset scroll */
+}
 
-    .msg.right-msg .msg-bubble {
-      background-color: #d2e3fc;
-    }
+@media (max-width: 768px) {
+  section {
+    scroll-margin-top: 120px; /* offset lebih tinggi di HP */
+  }
+}
 
-    .msg-info {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.7em;
-      color: #666;
-      margin-bottom: 3px;
-    }
+section > .content {
+  width: 100%;
+  max-width: 1200px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  padding-right: 10px;
+}
 
-    .msg-text {
-      font-size: var(--chat-font-size, 0.85em);
-      color: #333;
-    }
+/* Scrollbar */
+section > .content::-webkit-scrollbar {
+  width: 6px;
+}
+section > .content::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}
+section > .content::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
 
-    .msger-inputarea {
-      display: flex;
-      padding: 10px;
-      background: #fff;
-      border-top: 1px solid #ddd;
-    }
+/* === Judul Section === */
+h2 {
+  color: #004aad;
+  margin-bottom: 20px;
+  font-size: 20px;
+  text-align: center;
+}
 
-    .msger-input {
-      flex: 1;
-      padding: 8px;
-      font-size: 0.9em;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      margin-right: 8px;
-    }
+/* === Infografis === */
+.infografis-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 30px;
+}
 
-    .msger-send-btn {
-      padding: 8px 16px;
-      background: rgb(20, 3, 252);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+.infografis-item {
+  flex: 1 1 calc(33.333% - 24px);
+  max-width: 300px;
+  text-align: center;
+}
 
-    .msger-send-btn:hover {
-      background: rgb(15, 2, 200);
-    }
-  </style>
+.infografis-item img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.infografis-item p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* === Info Penting === */
+.info-penting-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.info-penting-image {
+  flex: 1 1 300px;
+  max-width: 350px;
+}
+
+.info-penting-image img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.info-penting-text {
+  flex: 2 1 400px;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* === Berita === */
+.berita-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.berita-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 20px;
+}
+
+.berita-item img {
+  width: 300px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.berita-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.berita-text h3 {
+  font-size: 18px;
+  color: #004aad;
+  margin-bottom: 10px;
+}
+
+.berita-text p {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* === Efek Zoom Gambar === */
+.zoom-hover {
+  transition: transform 0.3s ease-in-out;
+  cursor: zoom-in;
+}
+
+.zoom-hover:hover {
+  transform: scale(1.5);
+  z-index: 10;
+  position: relative;
+}
+
+.infografis-item,
+.berita-item img,
+.info-penting-image,
+.galeri-item,
+.card img {
+  overflow: hidden;
+  position: relative;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .brand {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .brand-text {
+    font-size: 13px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  nav.nav-menu {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav.nav-menu a {
+    padding: 10px 20px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    width: 100%;
+  }
+
+  .infografis-item {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .infografis-item img {
+    height: 200px;
+  }
+
+  .info-penting-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-penting-image,
+  .info-penting-text {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .info-penting-text {
+    padding: 0 10px;
+  }
+
+  .berita-item {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .berita-item img {
+    width: 100%;
+    height: auto;
+  }
+
+  .berita-text {
+    text-align: center;
+  }
+
+  section > .content {
+    max-height: none;
+  }
+}
+</style>
 </head>
 
 <body>
-  <!-- Chatbox -->
-  <section class="msger">
-    <header class="msger-header centered-header">
-      <div class="logo-circle">
-        <img src="../static/img/LOGO_ROJO1.png" alt="RoJO Logo" />
-      </div>
-    </header>
+  <header>
+  <div class="container">
+    <div class="brand">
+      <img src="static/img/Logo_Head.png" alt="Logo Batang" style="height: 50px;">
+    </div>
+    <div class="menu-toggle">☰</div>
+    <nav class="nav-menu">
+      <a href="#profil">Profil</a>
+      <a href="#program">Program</a>
+      <a href="#ppid">PPID</a>
+      <a href="#berita">Berita</a>
+      <a href="#infografis">Infografis</a>
+      <a href="#info-penting">Info Penting</a>
+      <a href="#galeri">Galeri</a>
+      <a href="#download">Download</a>
+    </nav>
+  </div>
+</header>
 
-    <div class="msger-controls">
-      <label for="fontSizeSelect">Ukuran Font:</label>
-      <select id="fontSizeSelect">
-        <option value="0.7em">Kecil</option>
-        <option value="0.85em" selected>Normal</option>
-        <option value="1em">Besar</option>
-        <option value="1.2em">Sangat Besar</option>
-      </select>
+
+  <section id="profil">
+  <div class="content">
+  <h2>Profil Disdukcapil Kabupaten Batang</h2>
+  <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+    <!-- Bagian Teks -->
+    <div style="flex: 1 1 300px;">
+      <p class="lead">
+        Dinas Kependudukan dan Pencatatan Sipil (Disdukcapil) Kabupaten Batang bertanggung jawab dalam menyediakan layanan administrasi kependudukan yang cepat, tepat, dan transparan. 
+        Kami melayani masyarakat dalam berbagai proses administrasi seperti pengurusan KTP, Akta Kelahiran, Akta Kematian, Kartu Keluarga (KK), dan dokumen kependudukan lainnya.
+      </p>
+      <p>
+        Kami berkomitmen untuk memberikan pelayanan terbaik bagi warga Kabupaten Batang dengan memanfaatkan teknologi informasi untuk kemudahan akses.
+      </p>
+      <ul style="padding-left: 40px;">
+        <li><strong>Alamat:</strong> Jl. Dr. Wahidin No. 56, Kabupaten Batang, Jawa Tengah</li>
+        <li><strong>Jam Layanan:</strong> Senin - Kamis, 08.00 - 14.30 WIB | Jumat, 08.00 - 10.00 WIB</li>
+        <li><strong>Kontak:</strong> (0285) 8351008</li>
+        <li><strong>Email:</strong> disdukcapil@batangkab.go.id</li>
+      </ul>
+    </div>
+    
+
+    <!-- Bagian Gambar -->
+    <div style="flex: 1 1 300px;">
+      <img src="static/img/dukcapilkantor.jpeg" alt="Disdukcapil Kabupaten Batang" style="width: 100%; border-radius: 10px;" />
+    </div>
+  </div>
+  </div>
+</section>
+
+  <section id="program">
+  <div class="content">
+  <h2>Program Layanan Disdukcapil</h2>
+  <div class="row" style="display: flex; flex-wrap: wrap; gap: 20px;">
+    <!-- Program 1 -->
+    <div class="card" style="flex: 1 1 300px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden;">
+      <img src="static/img/Akta Kelahiran.jpeg" class="card-img-top" alt="Akta Kelahiran" style="width: 100%; height: 200px; object-fit: cover;">
+      <div class="card-body" style="padding: 15px;">
+        <h5 class="card-title">Akta Kelahiran</h5>
+        <p class="card-text">Proses pembuatan akta kelahiran baru maupun perubahan.</p>
+        <a href="#" class="btn btn-primary">Pelajari Lebih Lanjut</a>
+      </div>
     </div>
 
-    <main class="msger-chat"></main>
+    <!-- Program 2 -->
+    <div class="card" style="flex: 1 1 300px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden;">
+      <img src="static/img/Akta Kematian.jpeg" class="card-img-top" alt="Akta Kematian" style="width: 100%; height: 200px; object-fit: cover;">
+      <div class="card-body" style="padding: 15px;">
+        <h5 class="card-title">Akta Kematian</h5>
+        <p class="card-text">Proses pembuatan akta kematian untuk keluarga yang ditinggalkan.</p>
+        <a href="#" class="btn btn-primary">Pelajari Lebih Lanjut</a>
+      </div>
+    </div>
 
-    <form class="msger-inputarea" id="chatForm">
-      <input type="text" class="msger-input" id="textInput" placeholder="Ketikkan sesuatu..." required />
-      <button type="submit" class="msger-send-btn">Kirim</button>
-    </form>
-  </section>
+    <!-- Program 3 -->
+    <div class="card" style="flex: 1 1 300px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden;">
+      <img src="static/img/KTP.jpeg" class="card-img-top" alt="KTP Elektronik" style="width: 100%; height: 200px; object-fit: cover;">
+      <div class="card-body" style="padding: 15px;">
+        <h5 class="card-title">KTP Elektronik</h5>
+        <p class="card-text">Proses pengajuan dan pembuatan KTP Elektronik bagi warga.</p>
+        <a href="#" class="btn btn-primary">Pelajari Lebih Lanjut</a>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
 
-  <!-- Script -->
-  <script>
-    const msgerForm = document.querySelector("#chatForm");
-    const msgerInput = document.querySelector("#textInput");
-    const msgerChat = document.querySelector(".msger-chat");
-    const fontSizeSelect = document.querySelector("#fontSizeSelect");
+  <section id="ppid">
+  <div class="content">
+  <h2>PPID Disdukcapil Kabupaten Batang</h2>
+  <div style="max-width: 900px; margin: auto; text-align: justify;">
+    <p>
+      <strong>PPID DINAS KEPENDUDUKAN DAN PENCATATAN SIPIL KABUPATEN BATANG</strong><br>
+      Informasi merupakan kebutuhan pokok setiap orang bagi pengembangan pribadi dan lingkungan sosialnya serta merupakan bagian penting bagi ketahanan nasional. Hak memperoleh informasi merupakan hak asasi manusia dan kebutuhan informasi publik merupakan salah satu ciri penting negara demokratis. 
+    </p>
+    <p>
+      Tugas Pejabat Pengelola Informasi dan Dokumentasi (PPID) adalah menyediakan akses informasi publik bagi pemohon informasi. Sesuai dengan amanat pasal 13 UU No. 14 tahun 2008, Pemerintah Kabupaten Batang sebagai salah satu Badan Publik telah membentuk PPID melalui Keputusan Bupati Batang Nomor 485.2/240 Tahun 2013 tentang Pembentukan PPID.
+    </p>
+    <p>
+      Salah satu elemen penting dalam mewujudkan penyelenggaraan negara yang terbuka adalah hak publik untuk memperoleh informasi. Semakin terbuka penyelenggaraan negara untuk diawasi publik, maka semakin besar pula tingkat akuntabilitasnya. Hak atas informasi menjadi sangat penting karena dapat meningkatkan kualitas partisipasi masyarakat dalam proses pengambilan keputusan publik.
+    </p>
+    <p>
+      Keberadaan Undang-Undang tentang Keterbukaan Informasi Publik sangat penting sebagai landasan hukum yang berkaitan dengan:
+    </p>
+    <ul style="padding-left: 40px;">
+      <li>Hak setiap orang untuk memperoleh informasi</li>
+      <li>Kewajiban Badan Publik menyediakan dan melayani permintaan informasi secara cepat, tepat waktu, biaya ringan, dan cara sederhana</li>
+      <li>Pengecualian informasi bersifat ketat dan terbatas</li>
+      <li>Kewajiban Badan Publik membenahi sistem dokumentasi dan pelayanan informasi</li>
+    </ul>
+    <p>
+      Setiap Badan Publik wajib membuka akses atas informasi publik yang berkaitan dengan lembaganya. Ini mencakup lembaga eksekutif, yudikatif, legislatif, dan penyelenggara negara lainnya yang menggunakan dana dari APBN/APBD. Termasuk juga organisasi nonpemerintah yang menerima dana dari APBN/APBD, sumbangan masyarakat, atau luar negeri.
+    </p>
+    <div style="margin-top: 30px; text-align: center;">
+      <h3>Bagan Struktur PPID</h3>
+      <img src="static/img/struktur_ppid.png" alt="Struktur Organisasi PPID Disdukcapil Batang" style="max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 10px;">
+      <p style="font-size: 0.9em; color: #555;">Gambar: Struktur Organisasi PPID Disdukcapil Kabupaten Batang</p>
+    </div>
+  </div>
+</div>
+</section>
 
-    const BOT_IMG = "../static/img/LOGO_ROJO.png";
-    const PERSON_IMG = "../static/img/ping.png";
-    const BOT_NAME = "DUKCAPIL menjawab";
-    const PERSON_NAME = "Anda";
+  <section id="berita">
+  <div class="content">
+    <h2>Berita</h2>
+    <div class="berita-container">
 
-    msgerForm.addEventListener("submit", event => {
-      event.preventDefault();
-      const msgText = msgerInput.value;
-      if (!msgText) return;
-      appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
-      msgerInput.value = "";
-      botResponse(msgText);
-    });
-
-    function appendMessage(name, img, side, text) {
-      const msgHTML = `
-        <div class="msg ${side}-msg">
-          <div class="msg-img"><img src="${img}" alt="${name}" /></div>
-          <div class="msg-bubble">
-            <div class="msg-info">
-              <div class="msg-info-name">${name}</div>
-              <div class="msg-info-time">${formatDate(new Date())}</div>
-            </div>
-            <div class="msg-text">${text}</div>
-          </div>
+      <!-- Berita 1 -->
+      <div class="berita-item">
+        <img src="/static/img/berita1.jpeg" alt="Berita 1">
+        <div class="berita-text">
+          <h3>Pelayanan Akta Kelahiran di Desa Kedungmalang</h3>
+          <p>Pada tanggal 20 Juni 2025, Disdukcapil Batang mengadakan pelayanan jemput bola untuk pembuatan akta kelahiran di Desa Kedungmalang. Warga sangat antusias mengikuti kegiatan ini.</p>
         </div>
-      `;
-      msgerChat.insertAdjacentHTML("beforeend", msgHTML);
-      msgerChat.scrollTop = msgerChat.scrollHeight;
+      </div>
+
+      <!-- Berita 2 -->
+      <div class="berita-item">
+        <img src="/static/img/berita2.jpeg" alt="Berita 2">
+        <div class="berita-text">
+          <h3>Sosialisasi KTP Elektronik untuk Siswa SMA</h3>
+          <p>Kegiatan sosialisasi penggunaan KTP Elektronik dilaksanakan di SMA 1 Batang. Disdukcapil mengenalkan pentingnya KTP bagi usia 17 tahun ke atas.</p>
+        </div>
+      </div>
+
+      <!-- Tambahkan berita lain di sini dengan format yang sama -->
+
+    </div>
+  </div>
+</section>
+
+  <section id="infografis">
+  <div class="content">
+    <h2>Infografis</h2>
+    <div class="infografis-grid">
+      
+      <div class="infografis-item">
+        <img src="/static/img/infografis_pelayanan_gratis.jpeg" alt="Pelayanan Gratis" class="zoom-hover">
+        <p>Pelayanan Administrasi Kependudukan Gratis</p>
+      </div>
+
+      <div class="infografis-item">
+        <img src="/static/img/infografis_jenis_pelayanan.jpeg" alt="Jenis Pelayanan" class="zoom-hover">
+        <p>Jenis-Jenis Pelayanan Dukcapil</p>
+      </div>
+
+      <div class="infografis-item">
+        <img src="/static/img/diskon_KIA.jpeg" alt="Diskon Kyai Langgeng Untuk Pemilik KIA Kab. Batang" class="zoom-hover">
+        <p>Diskon Pemilik KIA</p>
+      </div>
+    </div>
+</section>
+
+
+
+
+ <section id="info-penting">
+  <div class="content">
+    <h2>Info Penting</h2>
+    <div class="infografis-grid">
+      <div class="infografis-item">
+        <img src="/static/img/Tahun_Baru_Islam.jpeg" alt="Tahun Baru Islam" class="zoom-hover">
+        <p>Pelayanan tutup tanggal 27 Juni 2025</p>
+      </div>
+      <div class="infografis-item">
+        <img src="/static/img/info_cuti_idul_adha.jpeg" alt="Cuti Idul Adha" class="zoom-hover">
+        <p>Pelayanan tutup selama Idul Adha: 6–9 Juni 2025</p>
+      </div>
+      <div class="infografis-item">
+        <img src="/static/img/Libur_Kenaikan_Almasih.png" alt="Info Online" class="zoom-hover">
+        <p>Libur dan Cuti Bersama Kenaikan Isa Almasih</p>
+      </div>
+    </div>
+</section>
+
+
+  <section id="galeri">
+  <div class="content">
+  <h2>Galeri Kegiatan</h2>
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px;">
+    
+    <div style="flex: 1 1 300px;">
+      <img src="/static/img/galeri1.jpeg" alt="Kegiatan 1" style="width: 100%; border-radius: 10px;">
+      <p style="text-align: center; margin-top: 10px;">Penerimaan Sertifikat Penghargaan PEKPP 2024</p>
+    </div>
+
+    <div style="flex: 1 1 300px;">
+      <img src="/static/img/galeri2.jpeg" alt="Kegiatan 2" style="width: 100%; border-radius: 10px;">
+      <p style="text-align: center; margin-top: 10px;">Perekaman KTP Elektronik di Kecamatan Pecalungan</p>
+    </div>
+
+    <div style="flex: 1 1 300px;">
+      <img src="/static/img/galeri3.jpeg" alt="Kegiatan 3" style="width: 100%; border-radius: 10px;">
+      <p style="text-align: center; margin-top: 10px;">Jemut Bola Rekam KTP el ODGJ dan Disabilitas</p>
+    </div>
+  </div>
+  </div>
+</section>
+
+  <section id="download">
+  <div class="content" style="overflow-x: auto;">
+    <h2 style="color: #004aad; margin-bottom: 20px; text-align: center;">Download Formulir</h2>
+    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+      <thead>
+        <tr style="background-color: #004aad; color: white;">
+          <th style="padding: 12px; border: 1px solid #ccc;">No</th>
+          <th style="padding: 12px; border: 1px solid #ccc;">Nama File</th>
+          <th style="padding: 12px; border: 1px solid #ccc;">Unduh</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background-color: #f2f2f2;">
+          <td style="padding: 10px; border: 1px solid #ccc;">1</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Buku Saku Pelayanan</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">
+            <a href="{{ url_for('static', filename='storage/Buku_Saku_Dafduk_Capil_2023.pdf') }}" download style="color: #004aad; font-weight: bold;">⬇️ Download</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ccc;">2</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Formulir Akta Kelahiran</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">
+            <a href="{{ url_for('static', filename='storage/SURAT_KETERANGAN_KELAHIRAN.pdf') }}" download style="color: #004aad; font-weight: bold;">⬇️ Download</a>
+          </td>
+        </tr>
+        <tr style="background-color: #f2f2f2;">
+          <td style="padding: 10px; border: 1px solid #ccc;">3</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Formulir Akta Kematian</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">
+            <a href="{{ url_for('static', filename='storage/FORMULIR_PELAPORAN_KEMATIAN.pdf') }}" download style="color: #004aad; font-weight: bold;">⬇️ Download</a>
+          </td>
+        </tr>
+        <tr style="background-color: #f2f2f2;">
+          <td style="padding: 10px; border: 1px solid #ccc;">4</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">F1.02 Formulir Pendaftaran Penduduk</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">
+            <a href="{{ url_for('static', filename='storage/F1.02 Pendaftaran Penduduk.pdf') }}" download style="color: #004aad; font-weight: bold;">⬇️ Download</a>
+          </td>
+        </tr>
+        <tr style="background-color: #f2f2f2;">
+          <td style="padding: 10px; border: 1px solid #ccc;">5</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">F1.03 Formulir Permohonan Pindah & SKTT</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">
+            <a href="{{ url_for('static', filename='storage/F1.03 Permohonan Pindah & SKTT.pdf') }}" download style="color: #004aad; font-weight: bold;">⬇️ Download</a>
+          </td>
+        </tr>
+        <tr style="background-color: #f2f2f2;">
+          <td style="padding: 10px; border: 1px solid #ccc;">6</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">F1.06 Formulir Perubahan Data</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">
+            <a href="{{ url_for('static', filename='storage/F1.06 Perubahan Data.pdf') }}" download style="color: #004aad; font-weight: bold;">⬇️ Download</a>
+          </td>
+        </tr>
+        <tr style="background-color: #f2f2f2;">
+          <td style="padding: 10px; border: 1px solid #ccc;">7</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">F2.01 Formulir Pelaporan Pencatatan Sipil</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">
+            <a href="{{ url_for('static', filename='storage/static/storage/F2.01 Formulir Pelaporan Pencatatan Sipil.pdf') }}" download style="color: #004aad; font-weight: bold;">⬇️ Download</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+  <div class="chat-icon" onclick="toggleChat()">
+    <img src="/static/img/Logo Chatbot.png" alt="Chatbot" class="chatbot-logo">
+    <span>Chatbot</span>
+  </div>
+
+  <!-- Chatbot Iframe -->
+  <div class="chat-popup" id="chatPopup">
+    <iframe src="/chatbot" frameborder="0" class="chat-iframe"></iframe>
+  </div>
+
+  <!-- Script Toggle -->
+  <script>
+    function toggleChat() {
+    const chatPopup = document.getElementById("chatPopup");
+    if (chatPopup.classList.contains("active")) {
+      chatPopup.classList.remove("active");
+    } else {
+      chatPopup.classList.add("active");
     }
+  }
+  function openChat() {
+    const chatPopup = document.getElementById("chatPopup");
+    const iframe = document.getElementById("chatIframe");
 
-    function botResponse(rawText) {
-      fetch('/get', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ 'msg': rawText })
-      })
-        .then(response => response.text())
-        .then(data => {
-          appendMessage(BOT_NAME, BOT_IMG, "left", data);
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    // Reload iframe to clear previous chat
+    iframe.src = "/chatbot";
+    chatPopup.classList.add("active");
+  }
 
-    function formatDate(date) {
-      const h = "0" + date.getHours();
-      const m = "0" + date.getMinutes();
-      return `${h.slice(-2)}:${m.slice(-2)}`;
-    }
-
-    fontSizeSelect.addEventListener("change", () => {
-      const size = fontSizeSelect.value;
-      document.documentElement.style.setProperty('--chat-font-size', size);
-    });
-
-    // Set default font size
-    document.documentElement.style.setProperty('--chat-font-size', fontSizeSelect.value);
+  function closeChat() {
+    const chatPopup = document.getElementById("chatPopup");
+    chatPopup.classList.remove("active");
+  }
   </script>
+  
+  <style>
+    .chat-icon {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #1403fc;
+      color: white;
+      border-radius: 30px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+
+    .chatbot-logo {
+      width: 22px;
+      height: 22px;
+      margin-right: 8px;
+    }
+
+    .chat-popup {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 360px;
+      height: 500px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1001;
+    }
+
+    .chat-popup.active {
+      display: flex;
+    }
+
+    .chat-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    </style>
+</script >
+<script>
+  const menuToggle = document.querySelector('.menu-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+
+  // Toggle menu
+  menuToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+  });
+
+  // Scroll ke section hanya 1 kali klik
+  document.querySelectorAll('.nav-menu a').forEach(link => {
+    link.addEventListener('click', function (e) {
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+
+      if (window.innerWidth <= 768 && navMenu.classList.contains('active')) {
+        e.preventDefault(); // cegah scroll default
+        navMenu.classList.remove('active'); // tutup menu
+
+        // Scroll setelah menu ditutup
+        setTimeout(() => {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+        }, 50); // jeda singkat, cukup 50ms
+      }
+      // Jika layar besar (desktop), biarkan default
+    });
+  });
+</script>
 </body>
 </html>
