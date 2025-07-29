@@ -4,7 +4,7 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # --- Fungsi Download dari Google Drive ---
 def download_file_from_google_drive(file_id, destination):
@@ -52,12 +52,12 @@ llm = ChatGroq(
     groq_api_key="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"
 )
 
-# --- Prompt Sistem ---
+# --- Prompt Sistem (Diperhalus) ---
 system_prompt = (
-    "Anda adalah asisten untuk menjawab pertanyaan tentang administrasi kependudukan. "
-    "Gunakan informasi dari konteks untuk menjawab dengan jelas, ringkas, dan dalam bahasa Indonesia. "
-    "Jika tidak yakin, katakan 'mohon maaf saya tidak tahu, saya hanya akan menjawab terkait administrasi kependudukan'. "
-    "Jawaban maksimal empat kalimat.\n\n"
+    "Anda adalah Rojo, asisten virtual yang menjawab pertanyaan tentang administrasi kependudukan di Disdukcapil. "
+    "Gunakan informasi dari konteks untuk menjawab sejelas dan seakurat mungkin. "
+    "Jika informasi tidak ditemukan secara langsung, berikan jawaban terbaik berdasarkan pengetahuan umum tentang prosedur Disdukcapil. "
+    "Jawaban maksimal 3–4 kalimat dalam bahasa Indonesia yang ramah, jelas, dan langsung ke inti jawaban.\n\n"
     "{context}"
 )
 
@@ -68,28 +68,33 @@ chat_prompt = ChatPromptTemplate.from_messages([
 
 output_parser = StrOutputParser()
 
-# --- RAG Function ---
+# --- RAG Function dengan Similarity Score Threshold ---
 def rag_chain_manual(question):
     try:
-        docs = vectorstore.similarity_search(question, k=4)
-        context = "\n\n".join([doc.page_content for doc in docs])
+        results = vectorstore.similarity_search_with_score(question, k=4)
+        threshold = 0.3
+        filtered_docs = [doc for doc, score in results if score >= threshold]
+
+        if not filtered_docs:
+            return "Maaf, saya belum menemukan informasi yang relevan untuk menjawab pertanyaan Anda."
+
+        context = "\n\n".join([doc.page_content for doc in filtered_docs])
         prompt = chat_prompt.format(context=context, question=question)
         response = llm.invoke(prompt)
         final_answer = output_parser.invoke(response)
 
-        # Tambahkan link hanya jika konteksnya relevan DAN belum ditambahkan
+        # Tambahan link jika relevan
         if "formulir" in final_answer.lower():
             final_answer += (
-            '<br><br>📄 Silakan unduh formulir di sini: '
-            '<a href="https://disdukcapil.batangkab.go.id/?p=6" target="_blank">disdukcapil.batangkab.go.id</a>'
+                '<br><br>📄 Silakan unduh formulir di sini: '
+                '<a href="https://disdukcapil.batangkab.go.id/?p=6" target="_blank">disdukcapil.batangkab.go.id</a>'
             )
-
         if "alamat" in final_answer.lower():
             final_answer += (
-            '<br><br>📍 Alamat Disdukcapil Batang bisa dilihat di Google Maps: '
-            '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7216395" target="_blank">Lihat di Google Maps</a>'
+                '<br><br>📍 Alamat Disdukcapil Batang bisa dilihat di Google Maps: '
+                '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7216395" target="_blank">Lihat di Google Maps</a>'
             )
-        return final_answer    
+        return final_answer
 
     except Exception as e:
         return f"Terjadi kesalahan: {str(e)}"
@@ -107,6 +112,6 @@ def get_bot_response():
     return rag_chain_manual(user_input)
 
 # --- Run Server ---
-if _name_ == "_main_":
-    port = int(os.environ.get('PORT', 5000))  # default ke 5000 jika PORT tidak disetel
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
