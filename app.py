@@ -52,12 +52,12 @@ llm = ChatGroq(
     groq_api_key="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"
 )
 
-# --- Prompt Sistem (Diperhalus) ---
+# --- Prompt Sistem ---
 system_prompt = (
-    "Anda adalah Rojo, asisten virtual yang menjawab pertanyaan tentang administrasi kependudukan di Disdukcapil. "
-    "Gunakan informasi dari konteks untuk menjawab sejelas dan seakurat mungkin. "
-    "Jika informasi tidak ditemukan secara langsung, berikan jawaban terbaik berdasarkan pengetahuan umum tentang prosedur Disdukcapil. "
-    "Jawaban maksimal 3–4 kalimat dalam bahasa Indonesia yang ramah, jelas, dan langsung ke inti jawaban.\n\n"
+    "Anda adalah asisten untuk menjawab pertanyaan tentang administrasi kependudukan. "
+    "Gunakan informasi dari konteks untuk menjawab dengan jelas, ringkas, dan dalam bahasa Indonesia. "
+    "Jika tidak yakin, katakan 'mohon maaf saya tidak tahu, saya hanya akan menjawab terkait administrasi kependudukan'. "
+    "Jawaban maksimal empat kalimat.\n\n"
     "{context}"
 )
 
@@ -68,33 +68,28 @@ chat_prompt = ChatPromptTemplate.from_messages([
 
 output_parser = StrOutputParser()
 
-# --- RAG Function dengan Similarity Score Threshold ---
+# --- RAG Function ---
 def rag_chain_manual(question):
     try:
-        results = vectorstore.similarity_search_with_score(question, k=4)
-        threshold = 0.3
-        filtered_docs = [doc for doc, score in results if score >= threshold]
-
-        if not filtered_docs:
-            return "Maaf, saya belum menemukan informasi yang relevan untuk menjawab pertanyaan Anda."
-
-        context = "\n\n".join([doc.page_content for doc in filtered_docs])
+        docs = vectorstore.similarity_search(question, k=4)
+        context = "\n\n".join([doc.page_content for doc in docs])
         prompt = chat_prompt.format(context=context, question=question)
         response = llm.invoke(prompt)
         final_answer = output_parser.invoke(response)
 
-        # Tambahan link jika relevan
+        # Tambahkan link hanya jika konteksnya relevan DAN belum ditambahkan
         if "formulir" in final_answer.lower():
             final_answer += (
-                '<br><br>📄 Silakan unduh formulir di sini: '
-                '<a href="https://disdukcapil.batangkab.go.id/?p=6" target="_blank">disdukcapil.batangkab.go.id</a>'
+            '<br><br>📄 Silakan unduh formulir di sini: '
+            '<a href="https://disdukcapil.batangkab.go.id/?p=6" target="_blank">disdukcapil.batangkab.go.id</a>'
             )
+
         if "alamat" in final_answer.lower():
             final_answer += (
-                '<br><br>📍 Alamat Disdukcapil Batang bisa dilihat di Google Maps: '
-                '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7216395" target="_blank">Lihat di Google Maps</a>'
+            '<br><br>📍 Alamat Disdukcapil Batang bisa dilihat di Google Maps: '
+            '<a href="https://www.google.com/maps/place/Dinas+Kependudukan+dan+Pencatatan+Sipil+(DISDUKCAPIL)+Kabupaten+Batang/@-6.9158304,109.7216395" target="_blank">Lihat di Google Maps</a>'
             )
-        return final_answer
+        return final_answer    
 
     except Exception as e:
         return f"Terjadi kesalahan: {str(e)}"
@@ -113,5 +108,5 @@ def get_bot_response():
 
 # --- Run Server ---
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5000))  # default ke 5000 jika PORT tidak disetel
     app.run(host='0.0.0.0', port=port)
