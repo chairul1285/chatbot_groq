@@ -69,6 +69,36 @@ chat_prompt = ChatPromptTemplate.from_messages([
 
 output_parser = StrOutputParser()
 
+# === Fungsi Validasi Pertanyaan ===
+def is_valid_question(question):
+    question = question.strip().lower()
+
+    greetings = {
+        'hai', 'halo', 'hi', 'hello',
+        'assalamualaikum', 'selamat pagi', 'selamat siang', 'selamat malam',
+        'terima kasih', 'makasih', 'thanks', 'thank you',
+        'ok', 'oke', 'baik', 'sip'
+    }
+    if question in greetings:
+        return True
+
+    if len(question) < 4:
+        return False
+    if len(question.split()) == 1:
+        meaningless = {'ya', 'tidak', 'enggak', 'loh', 'lah', 'hmm', 'eh'}
+        if question in meaningless or len(question) <= 3:
+            return False
+
+    keywords = [
+        'ktp', 'akta', 'kelahiran', 'kematian', 'kartu keluarga', 'kk', 'nik',
+        'dukcapil', 'pelayanan', 'dokumen', 'perekaman', 'pengurusan',
+        'formulir', 'online', 'alamat', 'jam buka', 'syarat'
+    ]
+    if not any(word in question for word in keywords):
+        return False
+
+    return True
+
 # --- RAG Function ---
 def rag_chain_manual(question):
     try:
