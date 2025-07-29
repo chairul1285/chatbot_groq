@@ -139,7 +139,13 @@ def get_bot_response():
     user_input = request.form.get("msg")
     if not user_input:
         return "Pertanyaan kosong."
-    return rag_chain_manual(user_input)
+    if is_greeting(user_input):
+        return "Waalaikumsalam! Ada yang bisa saya bantu terkait layanan administrasi kependudukan?"
+
+    if is_valid_question(user_input):
+        return rag_chain_manual(user_input)
+    else:
+        return "Maaf, saya kurang memahami pertanyaan Anda. Silakan tulis pertanyaan yang lebih spesifik terkait layanan Dukcapil."
 
 # --- Run Server ---
 if __name__ == "__main__":
