@@ -71,14 +71,8 @@ output_parser = StrOutputParser()
 # --- RAG Function ---
 def rag_chain_manual(question):
     try:
-        results = vectorstore.similarity_search_with_score(question, k=4)
-        threshold = 0.3
-        filtered_docs = [doc for doc, score in results if score >= threshold]
-
-        if not filtered_docs:
-            return "Maaf, saya belum menemukan informasi yang relevan untuk menjawab pertanyaan Anda."
-
-        context = "\n\n".join([doc.page_content for doc in filtered_docs])
+        docs = vectorstore.similarity_search(question, k=4)
+        context = "\n\n".join([doc.page_content for doc in docs])
         prompt = chat_prompt.format(context=context, question=question)
         response = llm.invoke(prompt)
         final_answer = output_parser.invoke(response)
