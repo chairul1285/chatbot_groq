@@ -54,10 +54,10 @@ llm = ChatGroq(
 
 # --- Prompt Sistem ---
 system_prompt = (
-    "Anda adalah asisten untuk menjawab pertanyaan tentang administrasi kependudukan. "
-    "Gunakan informasi dari konteks untuk menjawab dengan jelas, ringkas, dan dalam bahasa Indonesia. "
-    "Jika tidak yakin, katakan 'mohon maaf saya tidak tahu, saya hanya akan menjawab terkait administrasi kependudukan'. "
-    "Jawaban maksimal empat kalimat.\n\n"
+    "Anda adalah Rojo, asisten virtual yang menjawab pertanyaan tentang administrasi kependudukan di Disdukcapil. "
+    "Gunakan informasi dari konteks untuk menjawab sejelas dan seakurat mungkin. "
+    "Jika informasi tidak ditemukan secara langsung, berikan jawaban terbaik berdasarkan pengetahuan umum tentang prosedur Disdukcapil. "
+    "Jawaban maksimal 3–4 kalimat dalam bahasa Indonesia yang ramah, jelas, dan langsung ke inti jawaban.\n\n"
     "{context}"
 )
 
@@ -71,8 +71,14 @@ output_parser = StrOutputParser()
 # --- RAG Function ---
 def rag_chain_manual(question):
     try:
-        docs = vectorstore.similarity_search(question, k=4)
-        context = "\n\n".join([doc.page_content for doc in docs])
+        results = vectorstore.similarity_search_with_score(question, k=4)
+        threshold = 0.3
+        filtered_docs = [doc for doc, score in results if score >= threshold]
+
+        if not filtered_docs:
+            return "Maaf, saya belum menemukan informasi yang relevan untuk menjawab pertanyaan Anda."
+
+        context = "\n\n".join([doc.page_content for doc in filtered_docs])
         prompt = chat_prompt.format(context=context, question=question)
         response = llm.invoke(prompt)
         final_answer = output_parser.invoke(response)
