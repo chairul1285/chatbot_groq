@@ -69,18 +69,20 @@ chat_prompt = ChatPromptTemplate.from_messages([
 
 output_parser = StrOutputParser()
 
-# === Fungsi Validasi Pertanyaan ===
-def is_valid_question(question):
-    question = question.strip().lower()
-
+# === Fungsi Deteksi Sapaan ===
+def is_greeting(question):
     greetings = {
         'hai', 'halo', 'hi', 'hello',
-        'assalamualaikum', 'selamat pagi', 'selamat siang', 'selamat malam',
+        'assalamualaikum', 'assalamu’alaikum', 'assalamu alaikum',
+        'selamat pagi', 'selamat siang', 'selamat sore', 'selamat malam',
         'terima kasih', 'makasih', 'thanks', 'thank you',
         'ok', 'oke', 'baik', 'sip'
     }
-    if question in greetings:
-        return True
+    return question.strip().lower() in greetings
+
+# === Fungsi Validasi Pertanyaan (untuk LLM) ===
+def is_valid_question(question):
+    question = question.strip().lower()
 
     if len(question) < 4:
         return False
